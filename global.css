@@ -1,0 +1,16 @@
+/* global.css */
+body {
+  background-color: black;
+  color: goldenrod; /* Adjust text color for readability */
+  margin: 0;
+  padding: 0;
+  font-family: Arial, sans-serif; /* Or your preferred font */
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+/* Other global styles */
