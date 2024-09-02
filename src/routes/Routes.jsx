@@ -35,19 +35,16 @@ const router = createBrowserRouter([
   },
   {
     path: "/facility",
-    element: (
-      <ProtectedRoute>
-        <FacilityListingPage></FacilityListingPage>
-      </ProtectedRoute>
-    ),
+    element: <FacilityListingPage></FacilityListingPage>,
   },
   {
     path: "/facility/:id",
-    element: <FacilityDetailsPage></FacilityDetailsPage>,
+
+    element: <ProtectedRoute element={<FacilityDetailsPage />} />,
   },
   {
     path: "/facility/:id/book",
-    element: <BookingForm></BookingForm>,
+    element: <ProtectedRoute element={<BookingForm />} />,
   },
   {
     path: "/sign",

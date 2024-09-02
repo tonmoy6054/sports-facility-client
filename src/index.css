@@ -3,6 +3,6 @@
 @tailwind utilities;
 
 body {
-  background-color: black;
+  background-color: rgb(252, 250, 250);
   color: goldenrod;
 }

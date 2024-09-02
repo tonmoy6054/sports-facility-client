@@ -56,8 +56,14 @@ const AdminDashboard = () => {
   const [user, setUser] = useState(null);
   const { apiCall, loading } = useApi();
   const { token } = useContext(AuthContext);
+
   useEffect(() => {
     const fetchUserInfo = async () => {
+      if (!token) {
+        console.warn("No token found, cannot fetch user info");
+        return;
+      }
+
       try {
         const response = await apiCall({
           method: "GET",
@@ -67,20 +73,26 @@ const AdminDashboard = () => {
           },
         });
 
-        const newToken = response.data.newToken; // Assuming the new token is sent back with the response
+        const newToken = response.data.newToken;
         if (newToken) {
-          localStorage.setItem("token", newToken); // Update localStorage with the new token
+          localStorage.setItem("token", newToken); // Update the token if the server provides a new one
         }
 
-        setUser(response.data.data); // Set the user data with the response
+        setUser(response.data.data);
       } catch (error) {
-        console.error("Error fetching user info:", error);
-        alert("Failed to fetch user info"); // Optional: display a user-friendly error message
+        if (error.response && error.response.status === 401) {
+          // Handle unauthorized error (e.g., redirect to login)
+          alert("Session expired. Please log in again.");
+          // Redirect to login page logic
+        } else {
+          console.error("Error fetching user info:", error);
+          alert("Failed to fetch user info");
+        }
       }
     };
 
     fetchUserInfo();
-  }, []);
+  }, [token]);
 
   return (
     <div className="container mx-auto p-6">
