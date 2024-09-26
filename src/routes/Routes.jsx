@@ -15,6 +15,11 @@ import AddAdmin from "../components/Dashboard/AddAdmin";
 import AdminBookingManagement from "../components/Dashboard/AdminBookingManagement";
 import UserBookings from "../components/Dashboard/UserBookings";
 import ProtectedRoute from "./ProtectedRoute";
+import UserProfile from "../components/Dashboard/UserProfile";
+import EditProfile from "../components/Dashboard/EditProfile";
+import LoginForm from "../components/LoginForm";
+
+import BookingConfirmation from "../components/BookingConfirmation";
 
 const router = createBrowserRouter([
   {
@@ -26,6 +31,14 @@ const router = createBrowserRouter([
     element: <NotFound></NotFound>,
   },
   {
+    path: "/booking-form",
+    element: <BookingForm></BookingForm>,
+  },
+  {
+    path: "/booking-confirmation",
+    element: <BookingConfirmation></BookingConfirmation>,
+  },
+  {
     path: "/about",
     element: <AboutUs></AboutUs>,
   },
@@ -34,13 +47,13 @@ const router = createBrowserRouter([
     element: <ContactUs></ContactUs>,
   },
   {
-    path: "/facility",
+    path: "/facilities",
     element: <FacilityListingPage></FacilityListingPage>,
   },
   {
     path: "/facility/:id",
 
-    element: <ProtectedRoute element={<FacilityDetailsPage />} />,
+    element: <FacilityDetailsPage />,
   },
   {
     path: "/facility/:id/book",
@@ -71,12 +84,26 @@ const router = createBrowserRouter([
     element: <AdminBookingManagement />,
   },
   {
-    path: "/user/bookings",
-    element: <UserBookings />,
+    path: "/user/profile",
+    element: <UserProfile />,
   },
   {
-    path: "/booking-details/:bookingId",
+    path: "/edit-profile",
+    element: <EditProfile />,
+  },
+
+  {
+    path: "/user/:userId/bookings",
+    element: <UserBookings />,
+  },
+
+  {
+    path: "/bookings/:bookingId",
     element: <UserBookDetails />,
+  },
+  {
+    path: "/login",
+    element: <LoginForm />,
   },
 ]);
 export default router;

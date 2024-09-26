@@ -126,19 +126,17 @@ const Facilities = () => {
       try {
         const response = await apiCall({
           method: "GET",
-          url: "http://localhost:5000/api/facility",
+          url: "http://localhost:5000/api/facilities",
         });
 
-        console.log("Fetched facilities response:", response);
+        console.log("Fetched facilities response:", response); // Check the structure here
 
-        // Access the facilities array correctly
-        if (response && response.data && Array.isArray(response.data.data)) {
+        if (response && Array.isArray(response.data)) {
           setFacilities((prevFacilities) => {
             if (
-              JSON.stringify(prevFacilities) !==
-              JSON.stringify(response.data.data)
+              JSON.stringify(prevFacilities) !== JSON.stringify(response.data)
             ) {
-              return response.data.data;
+              return response.data;
             }
             return prevFacilities;
           });

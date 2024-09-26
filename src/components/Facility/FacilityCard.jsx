@@ -2,17 +2,23 @@
 import { useNavigate } from "react-router-dom";
 
 const FacilityCard = ({ facility }) => {
+  console.log(facility);
+
   const navigate = useNavigate();
 
   const handleViewDetails = () => {
-    navigate(`/facility/${facility._id}`);
+    if (facility._id) {
+      navigate(`/facility/${facility._id}`);
+    } else {
+      console.error("Facility ID is missing!");
+    }
   };
 
   return (
     <div className="bg-white shadow-md rounded-lg overflow-hidden">
       <img
-        src={facility.image}
-        alt={facility.name}
+        src={facility.image || "/placeholder-image.jpg"}
+        alt={facility.name || "Facility"}
         className="w-full h-48 object-cover"
       />
       <div className="p-4">

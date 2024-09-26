@@ -1,167 +1,3 @@
-// // import { useState, useEffect } from "react";
-// // import axios from "axios";
-// // import SearchAndFilters from "../SearchAndFilters";
-// // import FacilityCard from "./FacilityCard";
-
-// // const FacilityListingPage = () => {
-// //   const [facilities, setFacilities] = useState([]);
-// //   const [filteredFacilities, setFilteredFacilities] = useState([]);
-// //   const [searchTerm, setSearchTerm] = useState("");
-// //   const [priceRange, setPriceRange] = useState([0, 1000]); // Example price range
-
-// //   useEffect(() => {
-// //     const fetchFacilities = async () => {
-// //       try {
-// //         const response = await axios.get("http://localhost:5000/api/facility");
-
-// //         // Assuming the response structure is correct
-// //         const availableFacilities = response.data.data.filter(
-// //           (facility) => !facility.isDeleted
-// //         );
-
-// //         setFacilities(availableFacilities);
-// //         setFilteredFacilities(availableFacilities);
-// //       } catch (error) {
-// //         console.error("Error fetching facilities:", error);
-// //       }
-// //     };
-// //     fetchFacilities();
-// //   }, []);
-
-// //   useEffect(() => {
-// //     const filterFacilities = () => {
-// //       const filtered = facilities.filter(
-// //         (facility) =>
-// //           facility.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
-// //           facility.pricePerHour >= priceRange[0] &&
-// //           facility.pricePerHour <= priceRange[1]
-// //       );
-// //       setFilteredFacilities(filtered);
-// //     };
-// //     filterFacilities();
-// //   }, [searchTerm, priceRange, facilities]);
-
-// //   return (
-// //     <div className="container mx-auto my-10 px-4">
-// //       <h1 className="text-4xl font-bold text-center mb-10">
-// //         Available Facilities
-// //       </h1>
-// //       <SearchAndFilters
-// //         searchTerm={searchTerm}
-// //         setSearchTerm={setSearchTerm}
-// //         priceRange={priceRange}
-// //         setPriceRange={setPriceRange}
-// //       />
-// //       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-// //         {filteredFacilities.map((facility) => (
-// //           <FacilityCard key={facility._id} facility={facility} />
-// //         ))}
-// //       </div>
-// //     </div>
-// //   );
-// // };
-
-// // export default FacilityListingPage;
-
-// import { useState, useEffect } from "react";
-// import axios from "axios";
-// import SearchAndFilters from "../SearchAndFilters";
-// import FacilityCard from "./FacilityCard";
-
-// const FacilityListingPage = () => {
-//   const [facilities, setFacilities] = useState([]);
-//   const [filteredFacilities, setFilteredFacilities] = useState([]);
-//   const [searchTerm, setSearchTerm] = useState("");
-//   const [priceRange, setPriceRange] = useState([0, 1000]); // Example price range
-//   const [currentPage, setCurrentPage] = useState(1);
-//   const [itemsPerPage] = useState(4); // Number of items per page
-
-//   useEffect(() => {
-//     const fetchFacilities = async () => {
-//       try {
-//         const response = await axios.get("http://localhost:5000/api/facility");
-
-//         const availableFacilities = response.data.data.filter(
-//           (facility) => !facility.isDeleted
-//         );
-
-//         setFacilities(availableFacilities);
-//         setFilteredFacilities(availableFacilities);
-//       } catch (error) {
-//         console.error("Error fetching facilities:", error);
-//       }
-//     };
-//     fetchFacilities();
-//   }, []);
-
-//   useEffect(() => {
-//     const filterFacilities = () => {
-//       const filtered = facilities.filter(
-//         (facility) =>
-//           facility.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
-//           facility.pricePerHour >= priceRange[0] &&
-//           facility.pricePerHour <= priceRange[1]
-//       );
-//       setFilteredFacilities(filtered);
-//       setCurrentPage(1); // Reset to the first page whenever filters change
-//     };
-//     filterFacilities();
-//   }, [searchTerm, priceRange, facilities]);
-
-//   // Calculate the facilities to display on the current page
-//   const indexOfLastItem = currentPage * itemsPerPage;
-//   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-//   const currentFacilities = filteredFacilities.slice(
-//     indexOfFirstItem,
-//     indexOfLastItem
-//   );
-
-//   // Calculate the total number of pages
-//   const totalPages = Math.ceil(filteredFacilities.length / itemsPerPage);
-
-//   const handlePageChange = (pageNumber) => {
-//     setCurrentPage(pageNumber);
-//   };
-
-//   return (
-//     <div className="container mx-auto my-10 px-4">
-//       <h1 className="text-4xl font-bold text-center mb-10">
-//         Available Facilities
-//       </h1>
-//       <SearchAndFilters
-//         searchTerm={searchTerm}
-//         setSearchTerm={setSearchTerm}
-//         priceRange={priceRange}
-//         setPriceRange={setPriceRange}
-//       />
-//       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-//         {currentFacilities.map((facility) => (
-//           <FacilityCard key={facility._id} facility={facility} />
-//         ))}
-//       </div>
-
-//       {/* Pagination Controls */}
-//       <div className="flex justify-center mt-8">
-//         {Array.from({ length: totalPages }, (_, index) => (
-//           <button
-//             key={index}
-//             onClick={() => handlePageChange(index + 1)}
-//             className={`mx-1 px-3 py-1 border rounded ${
-//               currentPage === index + 1
-//                 ? "bg-blue-600 text-white"
-//                 : "bg-white text-blue-600"
-//             }`}
-//           >
-//             {index + 1}
-//           </button>
-//         ))}
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default FacilityListingPage;
-
 import { useState, useEffect } from "react";
 import SearchAndFilters from "../SearchAndFilters";
 import FacilityCard from "./FacilityCard";
@@ -179,13 +15,17 @@ const FacilityListingPage = () => {
   useEffect(() => {
     const fetchFacilities = async () => {
       try {
+        console.log("Fetching facilities..."); // Log fetching
         const response = await apiCall({
           method: "GET",
-          url: "http://localhost:5000/api/facility",
+          url: "http://localhost:5000/api/facilities",
         });
 
-        if (response.data && Array.isArray(response.data.data)) {
-          const availableFacilities = response.data.data.filter(
+        console.log("Facilities response:", response); // Log response
+
+        // Access the data property from the response
+        if (response && response.success && Array.isArray(response.data)) {
+          const availableFacilities = response.data.filter(
             (facility) => !facility.isDeleted
           );
 
@@ -202,7 +42,7 @@ const FacilityListingPage = () => {
     };
 
     fetchFacilities();
-  }, []);
+  }, []); // Empty dependency array to prevent infinite loop
 
   useEffect(() => {
     const filterFacilities = () => {

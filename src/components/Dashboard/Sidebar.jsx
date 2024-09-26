@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 
 const Sidebar = ({ role }) => {
+  const userId = "66bb6ea0c71de26aa8e347ec";
   return (
     <div className="w-64 bg-blue-800 text-white flex flex-col">
       <div className="px-6 py-4 text-lg font-semibold">
@@ -9,12 +10,12 @@ const Sidebar = ({ role }) => {
       <nav className="flex-grow">
         {role === "admin" ? (
           <>
-            <Link
+            {/* <Link
               to="/admin/overview"
               className="block px-6 py-3 hover:bg-blue-700"
             >
               Overview
-            </Link>
+            </Link> */}
             <Link
               to="/admin/booking-management"
               className="block px-6 py-3 hover:bg-blue-700"
@@ -36,14 +37,14 @@ const Sidebar = ({ role }) => {
           </>
         ) : (
           <>
-            <Link
+            {/* <Link
               to="/user/overview"
               className="block px-6 py-3 hover:bg-blue-700"
             >
               Overview
-            </Link>
+            </Link> */}
             <Link
-              to="/user/bookings"
+              to={`/user/${userId}/bookings`}
               className="block px-6 py-3 hover:bg-blue-700"
             >
               My Bookings

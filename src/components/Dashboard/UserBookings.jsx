@@ -1,96 +1,115 @@
-// /* eslint-disable react/prop-types */
-// import { useState, useEffect } from "react";
+// import { useContext, useEffect, useState } from "react";
+// import { useNavigate, useParams } from "react-router-dom";
 // import axios from "axios";
-// import { useNavigate } from "react-router-dom";
+// import AuthContext from "../../context/AuthContext";
 
-// const UserBookings = ({ userId }) => {
+// const UserBookings = () => {
+//   const { userId } = useParams();
+//   console.log(userId);
 //   const [bookings, setBookings] = useState([]);
+//   const [loading, setLoading] = useState(true);
+//   const [error, setError] = useState("");
 //   const navigate = useNavigate();
+//   const { token } = useContext(AuthContext); // Move the useContext hook back to the top level
+
 //   useEffect(() => {
-//     const fetchUserBookings = async () => {
+//     const fetchBookings = async () => {
 //       try {
 //         const response = await axios.get(
-//           `http://localhost:5000/api/users/${userId}/bookings`
+//           `http://localhost:5000/api/users/${userId}/bookings`,
+//           {
+//             headers: { Authorization: `Bearer ${token}` },
+//           }
 //         );
-//         setBookings(response.data.data);
-//       } catch (error) {
-//         console.error("Error fetching bookings", error);
+
+//         console.log("API Response:", response.data); // Log the full API response
+
+//         const bookingsData = response.data || [];
+//         setBookings(bookingsData);
+//       } catch (err) {
+//         const errorMsg =
+//           err.response?.data?.message || "Failed to fetch bookings.";
+//         setError(errorMsg);
+//       } finally {
+//         setLoading(false);
 //       }
 //     };
 
-//     fetchUserBookings();
-//   }, [userId]);
+//     fetchBookings();
+//   }, [userId, token]);
 
-//   const handleCancelBooking = async (bookingId) => {
+//   const handleViewDetails = (bookingId) => {
+//     navigate(`/bookings/${bookingId}`); // Navigate to the booking details page
+//   };
+
+//   const handleCancel = async (bookingId) => {
+//     console.log("JWT Token:", token); // Log the token for debugging
+
+//     if (!token) {
+//       alert("You need to be logged in to cancel a booking.");
+//       return;
+//     }
+
 //     try {
-//       const token = localStorage.getItem("token");
-
-//       if (!token) {
-//         throw new Error("No token found, please log in again.");
-//       }
-
-//       console.log("Token sent with request:", token);
-
 //       await axios.delete(`http://localhost:5000/api/bookings/${bookingId}`, {
 //         headers: {
-//           Authorization: `Bearer ${token}`,
+//           Authorization: `Bearer ${token}`, // Send the token in the Authorization header
 //         },
 //       });
 
-//       setBookings((prevBookings) =>
-//         prevBookings.filter((booking) => booking._id !== bookingId)
-//       );
-//     } catch (error) {
-//       console.error(
-//         "Error canceling booking",
-//         error.response?.data || error.message
-//       );
+//       setBookings(bookings.filter((booking) => booking._id !== bookingId));
+//       alert("Booking canceled successfully!");
+//     } catch (err) {
+//       console.error("Error:", err.response || err.message);
+//       alert("Failed to cancel the booking.");
 //     }
 //   };
 
-//   const handleViewDetails = (bookingId) => {
-//     navigate(`/booking-details/${bookingId}`);
-//   };
+//   if (loading) return <div>Loading...</div>;
+//   if (error) return <div>{error}</div>;
 
 //   return (
 //     <div>
-//       <h2>Your Bookings</h2>
-//       {bookings.length > 0 ? (
-//         bookings.map((booking) => (
-//           <div
-//             key={booking._id}
-//             className="booking-item p-4 bg-white shadow mb-4 rounded-lg"
-//           >
-//             <p>
-//               Facility: {booking.facility?.name || "Facility not available"}
-//             </p>
-//             <p>Date: {booking.date || "Date not available"}</p>
-//             <p>
-//               Time: {booking.startTime || "Start time not available"} -{" "}
-//               {booking.endTime || "End time not available"}
-//             </p>
-//             <p>Status: {booking.isBooked || "Status not available"}</p>
-//             <p>
-//               Amount Paid: ${booking.payableAmount || "Amount not available"}
-//             </p>
-//             <div className="flex space-x-4 mt-2">
-//               <button
-//                 className="bg-blue-500 text-white px-4 py-2 rounded"
-//                 onClick={() => handleViewDetails(booking._id)}
-//               >
-//                 View Details
-//               </button>
-//               <button
-//                 className="bg-red-500 text-white px-4 py-2 rounded"
-//                 onClick={() => handleCancelBooking(booking._id)}
-//               >
-//                 Cancel Booking
-//               </button>
-//             </div>
-//           </div>
-//         ))
-//       ) : (
+//       <h2 className="text-2xl font-semibold mb-4">My Bookings</h2>
+//       {bookings.length === 0 ? (
 //         <p>No bookings found.</p>
+//       ) : (
+//         <ul className="space-y-4">
+//           {bookings.map((booking) => (
+//             <li key={booking._id} className="p-4 bg-white shadow-md rounded">
+//               <div>
+//                 <strong>Date:</strong>{" "}
+//                 {new Date(booking.date).toLocaleDateString()}
+//               </div>
+//               <div>
+//                 <strong>Time:</strong> {booking.startTime} - {booking.endTime}
+//               </div>
+//               <div>
+//                 <strong>Facility:</strong>{" "}
+//                 {booking.facility
+//                   ? booking.facility.name
+//                   : "Facility not available"}
+//               </div>
+//               <div>
+//                 <strong>Amount:</strong> ${booking.payableAmount}
+//               </div>
+//               <div className="mt-4">
+//                 <button
+//                   onClick={() => handleCancel(booking._id)}
+//                   className="bg-red-600 text-white px-4 py-2 rounded mr-2"
+//                 >
+//                   Cancel
+//                 </button>
+//                 <button
+//                   onClick={() => handleViewDetails(booking._id)}
+//                   className="bg-blue-600 text-white px-4 py-2 rounded"
+//                 >
+//                   View Details
+//                 </button>
+//               </div>
+//             </li>
+//           ))}
+//         </ul>
 //       )}
 //     </div>
 //   );
@@ -98,110 +117,135 @@
 
 // export default UserBookings;
 
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { useApi } from "../../hooks/useApi";
+import { useContext, useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import axios from "axios";
+import AuthContext from "../../context/AuthContext";
 
-const UserBookings = ({ userId }) => {
-  // console.log(userId);
+const UserBookings = () => {
+  const { userId } = useParams();
   const [bookings, setBookings] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
   const navigate = useNavigate();
-  const { apiCall, loading, error } = useApi();
+  const { token } = useContext(AuthContext);
 
   useEffect(() => {
-    if (!userId) {
-      console.error("User ID is not defined.");
-      return;
-    }
-
-    const fetchUserBookings = async () => {
+    const fetchBookings = async () => {
       try {
-        const response = await apiCall({
-          method: "GET",
-          url: `http://localhost:5000/api/users/${userId}/bookings`,
-        });
-        // console.log("API Response:", response.data);
-        setBookings(response.data.data);
+        const response = await axios.get(
+          `http://localhost:5000/api/users/${userId}/bookings`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+
+        console.log("API Response:", response.data);
+
+        const bookingsData = response.data || [];
+        setBookings(bookingsData);
       } catch (err) {
-        console.error("Error fetching bookings:", err);
+        const errorMsg =
+          err.response?.data?.message || "Failed to fetch bookings.";
+        setError(errorMsg);
+      } finally {
+        setLoading(false);
       }
     };
 
-    fetchUserBookings();
-  }, [userId]);
+    fetchBookings();
+  }, [userId, token]);
 
-  const handleCancelBooking = async (bookingId) => {
+  const handleViewDetails = (bookingId) => {
+    navigate(`/bookings/${bookingId}`);
+  };
+
+  const handleCancel = async (bookingId) => {
+    if (!token) {
+      alert("You need to be logged in to cancel a booking.");
+      return;
+    }
+
     try {
-      await apiCall({
-        method: "DELETE",
-        url: `http://localhost:5000/api/bookings/${bookingId}`,
+      await axios.delete(`http://localhost:5000/api/bookings/${bookingId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       });
-      setBookings((prevBookings) =>
-        prevBookings.filter((booking) => booking._id !== bookingId)
-      );
+
+      setBookings(bookings.filter((booking) => booking._id !== bookingId));
+      alert("Booking canceled successfully!");
     } catch (err) {
-      console.error(
-        "Error canceling booking:",
-        err.response?.data || err.message
-      );
+      console.error("Error:", err.response || err.message);
+      alert("Failed to cancel the booking.");
     }
   };
 
-  const handleViewDetails = (bookingId) => {
-    navigate(`/booking-details/${bookingId}`);
-  };
-
-  if (loading) return <div>Loading...</div>;
-  if (error) {
-    return (
-      <div>
-        <p>Error: {error.message || "An unexpected error occurred."}</p>
-        {error.response?.status === 500 && (
-          <p>It seems there is an issue on our end. Please try again later.</p>
-        )}
-      </div>
-    );
-  }
+  if (loading) return <div className="text-center py-8">Loading...</div>;
+  if (error)
+    return <div className="text-center py-8 text-red-500">{error}</div>;
 
   return (
-    <div>
-      <h2 className="text-2xl font-semibold mb-4">Your Bookings</h2>
-      {bookings.length > 0 ? (
-        bookings.map((booking) => (
-          <div
-            key={booking._id}
-            className="booking-item p-4 bg-white shadow mb-4 rounded-lg"
-          >
-            <p>
-              Facility: {booking.facility?.name || "Facility not available"}
-            </p>
-            <p>Date: {booking.date || "Date not available"}</p>
-            <p>
-              Time: {booking.startTime || "Start time not available"} -{" "}
-              {booking.endTime || "End time not available"}
-            </p>
-            <p>Status: {booking.isBooked || "Status not available"}</p>
-            <p>
-              Amount Paid: ${booking.payableAmount || "Amount not available"}
-            </p>
-            <div className="flex space-x-4 mt-2">
-              <button
-                className="bg-blue-500 text-white px-4 py-2 rounded"
-                onClick={() => handleViewDetails(booking._id)}
-              >
-                View Details
-              </button>
-              <button
-                className="bg-red-500 text-white px-4 py-2 rounded"
-                onClick={() => handleCancelBooking(booking._id)}
-              >
-                Cancel Booking
-              </button>
-            </div>
-          </div>
-        ))
+    <div className="container mx-auto p-6">
+      <h2 className="text-3xl font-bold text-center text-gray-800 mb-8">
+        My Bookings
+      </h2>
+
+      {bookings.length === 0 ? (
+        <p className="text-center text-lg text-gray-600">No bookings found.</p>
       ) : (
-        <p>No bookings found.</p>
+        <ul className="space-y-6">
+          {bookings.map((booking) => (
+            <li
+              key={booking._id}
+              className="bg-white shadow-md rounded-lg p-6 hover:shadow-lg transition-shadow duration-300"
+            >
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <div>
+                  <strong className="text-gray-600">Date:</strong>{" "}
+                  <span className="text-gray-800">
+                    {new Date(booking.date).toLocaleDateString()}
+                  </span>
+                </div>
+                <div>
+                  <strong className="text-gray-600">Time:</strong>{" "}
+                  <span className="text-gray-800">
+                    {booking.startTime} - {booking.endTime}
+                  </span>
+                </div>
+                <div>
+                  <strong className="text-gray-600">Facility:</strong>{" "}
+                  <span className="text-gray-800">
+                    {booking.facility && booking.facility
+                      ? booking.facility
+                      : "Facility not available"}
+                  </span>
+                </div>
+                <div>
+                  <strong className="text-gray-600">Amount:</strong>{" "}
+                  <span className="text-gray-800">
+                    ${booking.payableAmount}
+                  </span>
+                </div>
+              </div>
+
+              <div className="flex justify-end space-x-4">
+                <button
+                  onClick={() => handleCancel(booking._id)}
+                  className="bg-red-600 text-white px-5 py-2 rounded-lg shadow-md hover:bg-red-700 transition duration-300"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={() => handleViewDetails(booking._id)}
+                  className="bg-blue-600 text-white px-5 py-2 rounded-lg shadow-md hover:bg-blue-700 transition duration-300"
+                >
+                  View Details
+                </button>
+              </div>
+            </li>
+          ))}
+        </ul>
       )}
     </div>
   );

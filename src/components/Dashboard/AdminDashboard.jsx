@@ -78,7 +78,7 @@ const AdminDashboard = () => {
           localStorage.setItem("token", newToken); // Update the token if the server provides a new one
         }
 
-        setUser(response.data.data);
+        setUser(response.data);
       } catch (error) {
         if (error.response && error.response.status === 401) {
           // Handle unauthorized error (e.g., redirect to login)

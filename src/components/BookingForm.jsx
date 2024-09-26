@@ -1,191 +1,197 @@
 // import { useState, useEffect } from "react";
 // import axios from "axios";
-// import BookingSummary from "./BookingSummary";
-// import PaymentButton from "./Facility/PaymentButton";
 
 // const BookingForm = () => {
-//   const [facilities, setFacilities] = useState([]);
-//   const [availableSlots, setAvailableSlots] = useState([]);
-//   const [bookingDetails, setBookingDetails] = useState(null);
-//   const [isBookingConfirmed, setIsBookingConfirmed] = useState(false);
-//   const [selectedFacility, setSelectedFacility] = useState("");
 //   const [date, setDate] = useState("");
-//   const [startTime, setStartTime] = useState("");
-//   const [endTime, setEndTime] = useState("");
+//   const [facilityId, setFacilityId] = useState("");
+//   const [availableSlots, setAvailableSlots] = useState([]);
+//   const [facilityDetails, setFacilityDetails] = useState(null);
+//   const [facilities, setFacilities] = useState([]);
+//   const [errorMessage, setErrorMessage] = useState("");
+//   const [bookingAmount, setBookingAmount] = useState(0);
+//   const [email, setEmail] = useState(""); // State for user email
+//   const [phone, setPhone] = useState(""); // State for user phone number
 
 //   useEffect(() => {
 //     const fetchFacilities = async () => {
 //       try {
-//         const response = await axios.get("http://localhost:5000/api/facility", {
-//           headers: {
-//             Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NmJiNmVhMGM3MWRlMjZhYThlMzQ3ZWMiLCJyb2xlIjoiYWRtaW4iLCJlbWFpbCI6IndlYkBwcm9ncmFtbWluZy1oZXJvLmNvbSIsImlhdCI6MTcyNDk0MzU4NywiZXhwIjoxNzI0OTc5NTg3fQ.Z112hKqZsEvC2DAoghQC-FBdgo3p0D2eHuBrk3_Gn40`,
-//           },
-//         });
-//         console.log("Facilities fetched:", response.data); // Log the response to check the data
-//         setFacilities(response.data.data); // Access the 'data' field
+//         const response = await axios.get(
+//           "http://localhost:5000/api/facilities"
+//         );
+//         if (response.data.success) {
+//           setFacilities(response.data.data);
+//         } else {
+//           setErrorMessage("No facilities available.");
+//         }
 //       } catch (error) {
-//         console.error("Error fetching facilities:", error);
+//         setErrorMessage("Error fetching facilities.");
 //       }
 //     };
-
 //     fetchFacilities();
 //   }, []);
 
-//   useEffect(() => {
-//     if (selectedFacility && date) {
-//       axios
-//         .get(`http://localhost:5000/api/check-availability`, {
-//           params: {
-//             facility: selectedFacility,
-//             date: date,
-//           },
-//           headers: {
-//             Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NmJiNmVhMGM3MWRlMjZhYThlMzQ3ZWMiLCJyb2xlIjoiYWRtaW4iLCJlbWFpbCI6IndlYkBwcm9ncmFtbWluZy1oZXJvLmNvbSIsImlhdCI6MTcyNDk0MzU4NywiZXhwIjoxNzI0OTc5NTg3fQ.Z112hKqZsEvC2DAoghQC-FBdgo3p0D2eHuBrk3_Gn40`,
-//           },
-//         })
-//         .then((response) => {
-//           const availableSlotsData = response.data.data; // Access the 'data' field inside response
-//           setAvailableSlots(availableSlotsData);
-//         })
-//         .catch((error) => {
-//           console.error("Error fetching available slots:", error);
-//         });
+//   const checkAvailability = async () => {
+//     if (!date || !facilityId) {
+//       setErrorMessage("Please select a date and facility.");
+//       return;
 //     }
-//   }, [selectedFacility, date]);
-
-//   const handleBookingSubmit = async (e) => {
-//     e.preventDefault(); // Prevent default form submission behavior
 
 //     try {
-//       const response = await axios.post(
-//         "http://localhost:5000/api/bookings",
-//         {
-//           facility: selectedFacility,
-//           date,
-//           startTime,
-//           endTime,
-//         },
-//         {
-//           headers: {
-//             "Content-Type": "application/json",
-//             Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NmJiNmVhMGM3MWRlMjZhYThlMzQ3ZWMiLCJyb2xlIjoiYWRtaW4iLCJlbWFpbCI6IndlYkBwcm9ncmFtbWluZy1oZXJvLmNvbSIsImlhdCI6MTcyNDk0OTU5OSwiZXhwIjoxNzI0OTg1NTk5fQ.d8tdqUUHrxXPTX8c38HV20LEtr83Vi7pdDglqcvGe7w`,
-//           },
-//         }
+//       const response = await axios.get(
+//         `http://localhost:5000/api/check-availability?date=${date}&facility=${facilityId}`
 //       );
-//       console.log("Booking created successfully:", response.data);
-//       setBookingDetails(response.data.data);
-//       setIsBookingConfirmed(true);
+
+//       if (response.data.success) {
+//         setAvailableSlots(response.data.availableSlots);
+//         setFacilityDetails(response.data.facilityDetails);
+//         setBookingAmount(response.data.facilityDetails.pricePerHour);
+//         setErrorMessage("");
+//       } else {
+//         setErrorMessage(response.data.message);
+//       }
 //     } catch (error) {
-//       console.error(
-//         "Error creating booking:",
-//         error.response ? error.response.data : error.message
+//       setErrorMessage("Error fetching availability.");
+//     }
+//   };
+
+//   const handleBooking = async (startTime, endTime) => {
+//     const durationInHours = (end - start) / (1000 * 60 * 60); // convert milliseconds to hours
+
+//     // Calculate the total amount
+//     const totalAmount = durationInHours * bookingAmount;
+//     const bookingDetails = {
+//       date,
+//       startTime,
+//       endTime,
+//       facilityId,
+//       amount: totalAmount,
+//       email, // Use dynamic email
+//       phone, // Use dynamic phone number
+//     };
+
+//     try {
+//       const paymentResponse = await axios.post(
+//         "http://localhost:5000/api/payment/init-payment",
+//         bookingDetails
 //       );
-//       alert("Failed to create booking. Please try again.");
+
+//       if (paymentResponse.data.success) {
+//         window.location.href = paymentResponse.data.payment_url;
+//       } else {
+//         setErrorMessage("Payment initiation failed. Try again.");
+//       }
+//     } catch (error) {
+//       setErrorMessage("Error initiating payment.");
 //     }
 //   };
 
 //   return (
-//     <div className="max-w-lg mx-auto p-6 bg-white shadow-md rounded-lg mt-10">
-//       {!isBookingConfirmed ? (
-//         <form onSubmit={handleBookingSubmit} className="space-y-4">
-//           <div>
-//             <label
-//               htmlFor="facility"
-//               className="block text-sm font-medium text-gray-700"
-//             >
-//               Facility:
-//             </label>
-//             <select
-//               name="facility"
-//               id="facility"
-//               value={selectedFacility}
-//               onChange={(e) => setSelectedFacility(e.target.value)}
-//               className="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-//               required
-//             >
-//               <option value="">Select a facility</option>
-//               {facilities.map((facility) => (
-//                 <option key={facility._id} value={facility._id}>
-//                   {facility.name}
-//                 </option>
-//               ))}
-//             </select>
-//           </div>
+//     <div className="max-w-3xl mx-auto p-6 bg-white shadow-md rounded-lg mt-10">
+//       <h1 className="text-3xl font-bold text-center mb-6">Booking Page</h1>
 
-//           <div>
-//             <label
-//               htmlFor="date"
-//               className="block text-sm font-medium text-gray-700"
-//             >
-//               Date:
-//             </label>
-//             <input
-//               type="date"
-//               name="date"
-//               id="date"
-//               value={date}
-//               onChange={(e) => setDate(e.target.value)}
-//               className="mt-1 block w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-//               required
-//             />
-//           </div>
+//       <div className="mb-4">
+//         <label htmlFor="date" className="block text-lg font-medium mb-2">
+//           Select Date:
+//         </label>
+//         <input
+//           id="date"
+//           type="date"
+//           className="w-full px-3 py-2 border rounded-md shadow-sm"
+//           value={date}
+//           onChange={(e) => setDate(e.target.value)}
+//         />
+//       </div>
 
-//           <div>
-//             <label
-//               htmlFor="startTime"
-//               className="block text-sm font-medium text-gray-700"
-//             >
-//               Start Time:
-//             </label>
-//             <input
-//               type="time"
-//               name="startTime"
-//               id="startTime"
-//               value={startTime}
-//               onChange={(e) => setStartTime(e.target.value)}
-//               className="mt-1 block w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-//               required
-//             />
-//           </div>
+//       <div className="mb-4">
+//         <label htmlFor="facility" className="block text-lg font-medium mb-2">
+//           Select Facility:
+//         </label>
+//         <select
+//           id="facility"
+//           className="w-full px-3 py-2 border rounded-md shadow-sm"
+//           value={facilityId}
+//           onChange={(e) => setFacilityId(e.target.value)}
+//         >
+//           <option value="">Select Facility</option>
+//           {facilities.map((facility) => (
+//             <option key={facility._id} value={facility._id}>
+//               {facility.name}
+//             </option>
+//           ))}
+//         </select>
+//       </div>
 
-//           <div>
-//             <label
-//               htmlFor="endTime"
-//               className="block text-sm font-medium text-gray-700"
-//             >
-//               End Time:
-//             </label>
-//             <input
-//               type="time"
-//               name="endTime"
-//               id="endTime"
-//               value={endTime}
-//               onChange={(e) => setEndTime(e.target.value)}
-//               className="mt-1 block w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-//               required
-//             />
-//           </div>
+//       <div className="mb-4">
+//         <label htmlFor="email" className="block text-lg font-medium mb-2">
+//           Email:
+//         </label>
+//         <input
+//           id="email"
+//           type="email"
+//           className="w-full px-3 py-2 border rounded-md shadow-sm"
+//           value={email}
+//           onChange={(e) => setEmail(e.target.value)}
+//           placeholder="Enter your email"
+//         />
+//       </div>
 
-//           <div className="flex justify-end">
-//             <button
-//               type="submit"
-//               className="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-//             >
-//               Proceed to Pay
-//             </button>
-//           </div>
-//         </form>
-//       ) : (
-//         <div className="mt-6">
-//           <BookingSummary bookingDetails={bookingDetails} />
-//           <div className="flex justify-center mt-4">
-//             <PaymentButton
-//               amount={bookingDetails.payableAmount}
-//               bookingId={bookingDetails._id}
-//             />
-//           </div>
+//       <div className="mb-4">
+//         <label htmlFor="phone" className="block text-lg font-medium mb-2">
+//           Phone:
+//         </label>
+//         <input
+//           id="phone"
+//           type="tel"
+//           className="w-full px-3 py-2 border rounded-md shadow-sm"
+//           value={phone}
+//           onChange={(e) => setPhone(e.target.value)}
+//           placeholder="Enter your phone number"
+//         />
+//       </div>
+
+//       <button
+//         onClick={checkAvailability}
+//         className="w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600"
+//       >
+//         Check Availability
+//       </button>
+
+//       {errorMessage && (
+//         <p className="text-red-500 mt-4 text-center">{errorMessage}</p>
+//       )}
+
+//       {facilityDetails && (
+//         <div className="mt-6 p-4 border rounded-md bg-gray-50">
+//           <h2 className="text-xl font-bold">{facilityDetails.name}</h2>
+//           <p className="text-gray-700">{facilityDetails.description}</p>
 //         </div>
 //       )}
+
+//       <div className="mt-6">
+//         <h3 className="text-xl font-semibold mb-4">Available Time Slots:</h3>
+//         {availableSlots.length > 0 ? (
+//           <ul className="space-y-2">
+//             {availableSlots.map((slot, index) => (
+//               <li
+//                 key={index}
+//                 className="flex justify-between items-center p-2 bg-gray-100 rounded-md"
+//               >
+//                 <span>
+//                   {slot.startTime} - {slot.endTime}
+//                 </span>
+//                 <button
+//                   onClick={() => handleBooking(slot.startTime, slot.endTime)}
+//                   className="bg-green-500 text-white py-1 px-3 rounded-md"
+//                 >
+//                   Book
+//                 </button>
+//               </li>
+//             ))}
+//           </ul>
+//         ) : (
+//           <p className="text-gray-500">No available slots.</p>
+//         )}
+//       </div>
 //     </div>
 //   );
 // };
@@ -193,209 +199,203 @@
 // export default BookingForm;
 
 import { useState, useEffect } from "react";
-// Adjust the import path as necessary
-import BookingSummary from "./BookingSummary";
-import PaymentButton from "./Facility/PaymentButton";
-import { useApi } from "../hooks/useApi";
+import axios from "axios";
 
 const BookingForm = () => {
-  const [facilities, setFacilities] = useState([]);
-  const [availableSlots, setAvailableSlots] = useState([]);
-  const [bookingDetails, setBookingDetails] = useState(null);
-  const [isBookingConfirmed, setIsBookingConfirmed] = useState(false);
-  const [selectedFacility, setSelectedFacility] = useState("");
   const [date, setDate] = useState("");
-  const [startTime, setStartTime] = useState("");
-  const [endTime, setEndTime] = useState("");
-
-  const { apiCall, loading, error } = useApi();
-  const token = localStorage.getItem("token");
-
+  const [facilityId, setFacilityId] = useState("");
+  const [availableSlots, setAvailableSlots] = useState([]);
+  const [facilityDetails, setFacilityDetails] = useState(null);
+  const [facilities, setFacilities] = useState([]);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [bookingAmount, setBookingAmount] = useState(0);
+  const [email, setEmail] = useState(""); // State for user email
+  const [phone, setPhone] = useState(""); // State for user phone number
+  const pricePerHour = 100;
   useEffect(() => {
     const fetchFacilities = async () => {
       try {
-        const response = await apiCall({
-          method: "GET",
-          url: "http://localhost:5000/api/facility",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        setFacilities(response.data.data); // Access the 'data' field
+        const response = await axios.get(
+          "http://localhost:5000/api/facilities"
+        );
+        if (response.data.success) {
+          setFacilities(response.data.data);
+        } else {
+          setErrorMessage("No facilities available.");
+        }
       } catch (error) {
-        console.error("Error fetching facilities:", error);
+        setErrorMessage("Error fetching facilities.");
       }
     };
-
     fetchFacilities();
-  }, [token]);
+  }, []);
 
-  useEffect(() => {
-    if (selectedFacility && date) {
-      const fetchAvailableSlots = async () => {
-        try {
-          const response = await apiCall({
-            method: "GET",
-            url: "http://localhost:5000/api/check-availability",
-            params: {
-              facility: selectedFacility,
-              date: date,
-            },
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          });
-          setAvailableSlots(response.data.data); // Access the 'data' field
-        } catch (error) {
-          console.error("Error fetching available slots:", error);
-        }
-      };
-
-      fetchAvailableSlots();
+  const checkAvailability = async () => {
+    if (!date || !facilityId) {
+      setErrorMessage("Please select a date and facility.");
+      return;
     }
-  }, [selectedFacility, date, token]);
-
-  const handleBookingSubmit = async (e) => {
-    e.preventDefault();
 
     try {
-      const response = await apiCall({
-        method: "POST",
-        url: "http://localhost:5000/api/bookings",
-        data: {
-          facility: selectedFacility,
-          date,
-          startTime,
-          endTime,
-        },
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NmJiNmVhMGM3MWRlMjZhYThlMzQ3ZWMiLCJyb2xlIjoiYWRtaW4iLCJlbWFpbCI6IndlYkBwcm9ncmFtbWluZy1oZXJvLmNvbSIsImlhdCI6MTcyNTEwNjk1NiwiZXhwIjoxNzI1MTQyOTU2fQ.cVILZc93j2lR3sE2NNXgTEqUDYWZyme7fp79YnjgytM`,
-        },
-      });
-      setBookingDetails(response.data.data);
-      setIsBookingConfirmed(true);
+      const response = await axios.get(
+        `http://localhost:5000/api/check-availability?date=${date}&facility=${facilityId}`
+      );
+
+      if (response.data.success) {
+        setAvailableSlots(response.data.availableSlots);
+        setFacilityDetails(response.data.facilityDetails);
+        setBookingAmount(response.data.facilityDetails.pricePerHour);
+        setErrorMessage("");
+      } else {
+        setErrorMessage(response.data.message);
+      }
     } catch (error) {
-      console.error("Error creating booking:", error);
-      alert("Failed to create booking. Please try again.");
+      setErrorMessage("Error fetching availability.");
     }
   };
 
-  if (loading)
-    return (
-      <div className="max-w-lg mx-auto p-6 bg-white shadow-md rounded-lg mt-10">
-        Loading...
-      </div>
-    );
-  if (error)
-    return (
-      <div className="max-w-lg mx-auto p-6 bg-white shadow-md rounded-lg mt-10">
-        Error: {error.message}
-      </div>
-    );
+  const handleBooking = async (startTime, endTime) => {
+    const start = new Date(`${date}T${startTime}`); // Convert to Date object
+    const end = new Date(`${date}T${endTime}`); // Convert to Date object
+    const durationInHours = (end - start) / (1000 * 60 * 60); // Convert milliseconds to hours
+
+    // Calculate the total amount
+    const totalAmount = durationInHours * pricePerHour;
+    console.log("Total Amount:", totalAmount);
+
+    const bookingDetails = {
+      date,
+      startTime,
+      endTime,
+      facilityId,
+      amount: totalAmount,
+      email, // Use dynamic email
+      phone, // Use dynamic phone number
+    };
+
+    try {
+      const paymentResponse = await axios.post(
+        "http://localhost:5000/api/payment/init-payment",
+        bookingDetails
+      );
+
+      if (paymentResponse.data.success) {
+        window.location.href = paymentResponse.data.payment_url;
+      } else {
+        setErrorMessage("Payment initiation failed. Try again.");
+      }
+    } catch (error) {
+      setErrorMessage("Error initiating payment.");
+    }
+  };
 
   return (
-    <div className="max-w-lg mx-auto p-6 bg-white shadow-md rounded-lg mt-10">
-      {!isBookingConfirmed ? (
-        <form onSubmit={handleBookingSubmit} className="space-y-4">
-          <div>
-            <label
-              htmlFor="facility"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Facility:
-            </label>
-            <select
-              name="facility"
-              id="facility"
-              value={selectedFacility}
-              onChange={(e) => setSelectedFacility(e.target.value)}
-              className="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-              required
-            >
-              <option value="">Select a facility</option>
-              {facilities.map((facility) => (
-                <option key={facility._id} value={facility._id}>
-                  {facility.name}
-                </option>
-              ))}
-            </select>
-          </div>
+    <div className="max-w-3xl mx-auto p-6 bg-white shadow-md rounded-lg mt-10">
+      <h1 className="text-3xl font-bold text-center mb-6">Booking Page</h1>
 
-          <div>
-            <label
-              htmlFor="date"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Date:
-            </label>
-            <input
-              type="date"
-              name="date"
-              id="date"
-              value={date}
-              onChange={(e) => setDate(e.target.value)}
-              className="mt-1 block w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-              required
-            />
-          </div>
+      <div className="mb-4">
+        <label htmlFor="date" className="block text-lg font-medium mb-2">
+          Select Date:
+        </label>
+        <input
+          id="date"
+          type="date"
+          className="w-full px-3 py-2 border rounded-md shadow-sm"
+          value={date}
+          onChange={(e) => setDate(e.target.value)}
+        />
+      </div>
 
-          <div>
-            <label
-              htmlFor="startTime"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Start Time:
-            </label>
-            <input
-              type="time"
-              name="startTime"
-              id="startTime"
-              value={startTime}
-              onChange={(e) => setStartTime(e.target.value)}
-              className="mt-1 block w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-              required
-            />
-          </div>
+      <div className="mb-4">
+        <label htmlFor="facility" className="block text-lg font-medium mb-2">
+          Select Facility:
+        </label>
+        <select
+          id="facility"
+          className="w-full px-3 py-2 border rounded-md shadow-sm"
+          value={facilityId}
+          onChange={(e) => setFacilityId(e.target.value)}
+        >
+          <option value="">Select Facility</option>
+          {facilities.map((facility) => (
+            <option key={facility._id} value={facility._id}>
+              {facility.name}
+            </option>
+          ))}
+        </select>
+      </div>
 
-          <div>
-            <label
-              htmlFor="endTime"
-              className="block text-sm font-medium text-gray-700"
-            >
-              End Time:
-            </label>
-            <input
-              type="time"
-              name="endTime"
-              id="endTime"
-              value={endTime}
-              onChange={(e) => setEndTime(e.target.value)}
-              className="mt-1 block w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-              required
-            />
-          </div>
+      <div className="mb-4">
+        <label htmlFor="email" className="block text-lg font-medium mb-2">
+          Email:
+        </label>
+        <input
+          id="email"
+          type="email"
+          className="w-full px-3 py-2 border rounded-md shadow-sm"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          placeholder="Enter your email"
+        />
+      </div>
 
-          <div className="flex justify-end">
-            <button
-              type="submit"
-              className="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-            >
-              Proceed to Pay
-            </button>
-          </div>
-        </form>
-      ) : (
-        <div className="mt-6">
-          <BookingSummary bookingDetails={bookingDetails} />
-          <div className="flex justify-center mt-4">
-            <PaymentButton
-              amount={bookingDetails.payableAmount}
-              bookingId={bookingDetails._id}
-            />
-          </div>
+      <div className="mb-4">
+        <label htmlFor="phone" className="block text-lg font-medium mb-2">
+          Phone:
+        </label>
+        <input
+          id="phone"
+          type="tel"
+          className="w-full px-3 py-2 border rounded-md shadow-sm"
+          value={phone}
+          onChange={(e) => setPhone(e.target.value)}
+          placeholder="Enter your phone number"
+        />
+      </div>
+
+      <button
+        onClick={checkAvailability}
+        className="w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600"
+      >
+        Check Availability
+      </button>
+
+      {errorMessage && (
+        <p className="text-red-500 mt-4 text-center">{errorMessage}</p>
+      )}
+
+      {facilityDetails && (
+        <div className="mt-6 p-4 border rounded-md bg-gray-50">
+          <h2 className="text-xl font-bold">{facilityDetails.name}</h2>
+          <p className="text-gray-700">{facilityDetails.description}</p>
         </div>
       )}
+
+      <div className="mt-6">
+        <h3 className="text-xl font-semibold mb-4">Available Time Slots:</h3>
+        {availableSlots.length > 0 ? (
+          <ul className="space-y-2">
+            {availableSlots.map((slot, index) => (
+              <li
+                key={index}
+                className="flex justify-between items-center p-2 bg-gray-100 rounded-md"
+              >
+                <span>
+                  {slot.startTime} - {slot.endTime}
+                </span>
+                <button
+                  onClick={() => handleBooking(slot.startTime, slot.endTime)}
+                  className="bg-green-500 text-white py-1 px-3 rounded-md"
+                >
+                  Book
+                </button>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="text-gray-500">No available slots.</p>
+        )}
+      </div>
     </div>
   );
 };
